@@ -31,4 +31,12 @@ defmodule RoomNamesTest do
       refute RoomNames.valid?(input)
     end
   end
+
+  describe "#decrypt_name/1" do
+    test "will work" do
+      input = {["qzmt", "zixmtkozy", "ivhz"], 343, "blah"}
+      expected = {["very", "encrypted", "name"], 343, "blah"}
+      assert RoomNames.decrypt(input) == expected
+    end
+  end
 end

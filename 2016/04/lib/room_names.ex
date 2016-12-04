@@ -8,6 +8,15 @@ defmodule RoomNames do
     |> Enum.reduce(0, &sum_sectors/2)
   end
 
+  def run_part_two() do
+    File.read!("./data/input.txt")
+    |> String.split("\n", trim: true)
+    |> Enum.map(&decode/1)
+    |> Enum.filter(&valid?/1)
+    |> Enum.map(&decrypt/1)
+    |> Enum.find(&filter_with_names(&1, ["northpole", "object", "storage"]))
+  end
+
   def decode(input) do
     input
     |> String.trim()
@@ -22,6 +31,26 @@ defmodule RoomNames do
     |> Enum.take(5)
     |> List.foldl("", fn ({l, _}, v) -> v <> l end)
     |> Kernel.==(checksum)
+  end
+
+  def decrypt({names, sector_id, checksum}) do
+    {names |> Enum.map(&decrypt_name(&1, sector_id)),
+     sector_id,
+     checksum}
+  end
+
+  def decrypt_name(name, sector_id) do
+    name
+    |> String.graphemes()
+    |> Enum.map(&decrypt_letter(&1, sector_id))
+    |> List.to_string()
+  end
+
+  def decrypt_letter("-", _), do: " "
+  def decrypt_letter(<<c :: utf8>> = l, n) when is_binary(l), do: decrypt_letter(c, n)
+  def decrypt_letter(l, n) when l >= ?a and l <= ?z do
+    len = ?z - ?a + 1
+    rem(l - ?a + n, len) + ?a
   end
 
   defp extract_parts(input) do
@@ -57,4 +86,7 @@ defmodule RoomNames do
   end
 
   defp sum_sectors({_, sector_id, _}, acc), do: acc + sector_id
+
+  defp filter_with_names({names, _, _}, names), do: true
+  defp filter_with_names(_, _), do: false
 end
