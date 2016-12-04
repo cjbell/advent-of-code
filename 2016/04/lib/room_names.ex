@@ -47,11 +47,11 @@ defmodule RoomNames do
   end
 
   def decrypt_letter("-", _), do: " "
-  def decrypt_letter(<<c :: utf8>> = l, n) when is_binary(l), do: decrypt_letter(c, n)
-  def decrypt_letter(l, n) when l >= ?a and l <= ?z do
+  def decrypt_letter(<<l>>, n) when l >= ?a and l <= ?z do
     len = ?z - ?a + 1
     rem(l - ?a + n, len) + ?a
   end
+  def decrypt_letter(l, _), do: l
 
   defp extract_parts(input) do
     input
@@ -77,8 +77,8 @@ defmodule RoomNames do
     end
   end
 
-  defp sort([c1 | _ ] = one, [c2 | _] = two) 
-    when length(one) == length(two), do: c1 < c2 
+  defp sort([c1 | _ ] = one, [c2 | _] = two)
+    when length(one) == length(two), do: c1 < c2
   defp sort(one, two), do: length(one) > length(two)
 
   defp map_values({k, v}) do
